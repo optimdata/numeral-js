@@ -180,6 +180,25 @@ exports.format = {
         test.done();
     },
     
+    duration: function (test) {
+        var tests = [
+                [25,'0 !','25 seconds'],
+                [60,'0.[0] !','1 minutes'],
+                [90,'0.[0] !','1.5 minutes'],
+                [4600,'0. !','1 hours'],
+                [400000,'0.[0] !','4.6 days'],
+            ],
+            i;
+
+        test.expect(tests.length);
+
+        for (i = 0; i < tests.length; i++) {
+            test.strictEqual(numeral(tests[i][0]).format(tests[i][1]), tests[i][2], tests[i][1]);
+        }
+
+        test.done();
+    },
+    
     rounding: function (test) {
       var tests = [
             // value, format string, expected w/ floor, expected w/ ceil
