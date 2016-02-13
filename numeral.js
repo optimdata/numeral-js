@@ -71,6 +71,8 @@
             output = formatPercentage(n, format, roundingFunction);
         } else if (format.indexOf(':') > -1) { // time
             output = formatTime(n, format);
+        } else if (format.indexOf('!') > -1) { // time
+            output = formatDuration(n, format, roundingFunction);
         } else { // plain ol' numbers or bytes
             output = formatNumber(n._value, format, roundingFunction);
         }
@@ -225,6 +227,51 @@
             seconds = seconds + Number(timeArray[1]);
         }
         return Number(seconds);
+    }
+
+    function formatDuration (n, format, roundingFunction) {
+        var space = '',
+            output,
+            value = n._value,
+            suffix = 'seconds';
+
+        if (value >= 365 * 86400) {
+            suffix = 'years';
+            value /= 365 * 86400;
+        } else if (value >= 86400) {
+            suffix = 'days';
+            value /= 86400;
+        } else if (value >= 3600) {
+            suffix = 'hours';
+            value /= 3600;
+        } else if (value >= 60) {
+            suffix = 'minutes';
+            value /= 60;
+        }
+
+        // check for space before %
+        if (format.indexOf(' !') > -1) {
+            space = ' ';
+            format = format.replace(' !', '');
+        } else {
+            format = format.replace('!', '');
+        }
+
+        output = formatNumber(value, format, roundingFunction);
+        
+        if (output.indexOf(')') > -1 ) {
+            output = output.split('');
+            output.splice(-1, 0, space + '!');
+            output = output.join('');
+        } else {
+            output = output + space + suffix;
+        }
+
+        return output;
+    }
+
+    function unformatDuration(string) {
+        return 0;
     }
 
     function formatNumber (value, format, roundingFunction) {
