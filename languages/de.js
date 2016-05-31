@@ -13,12 +13,6 @@
             thousand: 'k',
             million: 'm',
             billion: 'b',
-            trillion: 't'
-        },
-        abbreviations: {
-            thousand: 'k',
-            million: 'm',
-            billion: 'b',
             trillion: 't',
             seconds: 's',
             minutes: 'min',
