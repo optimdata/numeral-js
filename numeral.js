@@ -71,8 +71,10 @@
             output = formatPercentage(n, format, roundingFunction);
         } else if (format.indexOf(':') > -1) { // time
             output = formatTime(n, format);
-        } else if (format.indexOf('!') > -1) { // time
-            output = formatDuration(n, format, roundingFunction);
+        } else if (format.indexOf('!!') > -1) { // duration short format
+            output = formatDuration(n, format, roundingFunction, true);
+        } else if (format.indexOf('!') > -1) { // duration long format
+            output = formatDuration(n, format, roundingFunction, false);
         } else { // plain ol' numbers or bytes
             output = formatNumber(n._value, format, roundingFunction);
         }
@@ -229,9 +231,11 @@
         return Number(seconds);
     }
 
-    function formatDuration (n, format, roundingFunction) {
+    function formatDuration (n, format, roundingFunction, isAbbreviated) {
         var space = '',
             output,
+            pattern = isAbbreviated ? '!!' : '!',
+            language = languages[currentLanguage],
             value = n._value,
             suffix = 'seconds';
 
@@ -249,19 +253,31 @@
             value /= 60;
         }
 
-        // check for space before %
-        if (format.indexOf(' !') > -1) {
+        if (language.durations != null && language.isPlural != null) {
+            if (isAbbreviated) {
+                suffix = language.abbreviations[suffix];
+            } else {
+                if (language.isPlural(value)) {
+                    suffix = language.durations.plural[suffix];
+                } else {
+                    suffix = language.duration.singular[suffix];
+                }
+            }
+        }
+
+        // check for space before '!'
+        if (format.indexOf(' ' + pattern) > -1) {
             space = ' ';
-            format = format.replace(' !', '');
+            format = format.replace(' ' + pattern, '');
         } else {
-            format = format.replace('!', '');
+            format = format.replace(pattern, '');
         }
 
         output = formatNumber(value, format, roundingFunction);
         
         if (output.indexOf(')') > -1 ) {
             output = output.split('');
-            output.splice(-1, 0, space + '!');
+            output.splice(-1, 0, space + pattern);
             output = output.join('');
         } else {
             output = output + space + suffix;
@@ -506,7 +522,37 @@
             thousand: 'k',
             million: 'm',
             billion: 'b',
-            trillion: 't'
+            trillion: 't',
+            seconds: 's',
+            minutes: 'min',
+            hours: 'h',
+            days: 'd',
+            weeks: 'wk',
+            months: 'mo',
+            years: 'y',
+        },
+        isPlural: function (amount) {
+            return amount === 1 ? 0 : 1;
+        },
+        durations: {
+            plural: {
+                seconds: 'seconds',
+                minutes: 'minutes',
+                hours: 'hours',
+                days: 'days',
+                weeks: 'weeks',
+                months: 'months',
+                years: 'years',
+            },
+            singular: {
+                seconds: 'second',
+                minutes: 'minute',
+                hours: 'hour',
+                days: 'day',
+                weeks: 'week',
+                months: 'month',
+                years: 'year',
+            },
         },
         ordinal: function (number) {
             var b = number % 10;
