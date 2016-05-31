@@ -257,10 +257,12 @@
             if (isAbbreviated) {
                 suffix = language.abbreviations[suffix];
             } else {
-                if (language.isPlural(value)) {
+                var precision = format.replace(pattern, '').split(format.indexOf('[.]') > -1 ? '[.]' : '.')[1];
+                var hasPrecision = precision != null && precision.trim().length > 0;
+                if (language.isPlural(hasPrecision ? value : value | 0)) {
                     suffix = language.durations.plural[suffix];
                 } else {
-                    suffix = language.duration.singular[suffix];
+                    suffix = language.durations.singular[suffix];
                 }
             }
         }
