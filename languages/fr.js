@@ -13,7 +13,37 @@
             thousand: 'k',
             million: 'm',
             billion: 'b',
-            trillion: 't'
+            trillion: 't',
+            seconds: 's',
+            minutes: 'min.',
+            hours: 'h',
+            days: 'j',
+            weeks: 'sem.',
+            months: 'mois',
+            years: 'a',
+        },
+        isPlural: function (amount) {
+            return amount != null && amount > 1 ? 1 : 0;
+        },
+        durations: {
+            plural: {
+                seconds: 'secondes',
+                minutes: 'minutes',
+                hours: 'heures',
+                days: 'jours',
+                weeks: 'semaines',
+                months: 'mois',
+                years: 'années',
+            },
+            singular: {
+                seconds: 'seconde',
+                minutes: 'minute',
+                hours: 'heure',
+                days: 'jour',
+                weeks: 'semaine',
+                months: 'mois',
+                years: 'année',
+            },
         },
         ordinal : function (number) {
             return number === 1 ? 'er' : 'e';
