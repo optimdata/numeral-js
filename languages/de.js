@@ -15,6 +15,42 @@
             billion: 'b',
             trillion: 't'
         },
+        abbreviations: {
+            thousand: 'k',
+            million: 'm',
+            billion: 'b',
+            trillion: 't',
+            seconds: 's',
+            minutes: 'min',
+            hours: 'h',
+            days: 'd',
+            weeks: 'w',
+            months: 'mo',
+            years: 'y',
+        },
+        isPlural: function (amount) {
+            return amount === 1 ? 0 : 1;
+        },
+        durations: {
+            plural: {
+                seconds: 'Sekunden',
+                minutes: 'Minuten',
+                hours: 'Stunden',
+                days: 'Tage',
+                weeks: 'Wochen',
+                months: 'Monten',
+                years: 'Jahre',
+            },
+            singular: {
+                seconds: 'Sekunde',
+                minutes: 'Minute',
+                hours: 'Stunde',
+                days: 'Tag',
+                weeks: 'Woche',
+                months: 'Monat',
+                years: 'Jahr',
+            },
+        },
         ordinal: function (number) {
             return '.';
         },
