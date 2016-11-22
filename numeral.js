@@ -237,18 +237,19 @@
             pattern = isAbbreviated ? '!!' : '!',
             language = languages[currentLanguage],
             value = n._value,
-            suffix = 'seconds';
-
-        if (value >= 365 * 86400) {
+            suffix = 'seconds',
+            absValue = Math.abs(value);
+        
+        if (absValue >= 365 * 86400) {
             suffix = 'years';
             value /= 365 * 86400;
-        } else if (value >= 86400) {
+        } else if (absValue >= 86400) {
             suffix = 'days';
             value /= 86400;
-        } else if (value >= 3600) {
+        } else if (absValue >= 3600) {
             suffix = 'hours';
             value /= 3600;
-        } else if (value >= 60) {
+        } else if (absValue >= 60) {
             suffix = 'minutes';
             value /= 60;
         }
@@ -257,7 +258,6 @@
             if (isAbbreviated) {
                 suffix = language.abbreviations[suffix];
             } else {
-                var absValue = Math.abs(value);
                 var precision = format.replace(pattern, '').split(format.indexOf('[.]') > -1 ? '[.]' : '.')[1];
                 var hasPrecision = precision != null && precision.trim().length > 0;
                 if (language.isPlural(hasPrecision ? absValue : absValue | 0)) {
