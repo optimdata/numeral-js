@@ -257,9 +257,10 @@
             if (isAbbreviated) {
                 suffix = language.abbreviations[suffix];
             } else {
+                var absValue = Math.abs(value);
                 var precision = format.replace(pattern, '').split(format.indexOf('[.]') > -1 ? '[.]' : '.')[1];
                 var hasPrecision = precision != null && precision.trim().length > 0;
-                if (language.isPlural(hasPrecision ? value : value | 0)) {
+                if (language.isPlural(hasPrecision ? absValue : absValue | 0)) {
                     suffix = language.durations.plural[suffix];
                 } else {
                     suffix = language.durations.singular[suffix];
