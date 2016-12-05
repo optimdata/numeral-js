@@ -239,7 +239,6 @@
             value = n._value,
             suffix = 'seconds',
             absValue = Math.abs(value);
-        
         if (absValue >= 365 * 86400) {
             suffix = 'years';
             value /= 365 * 86400;
@@ -253,6 +252,7 @@
             suffix = 'minutes';
             value /= 60;
         }
+        absValue = Math.abs(value);
 
         if (language.durations != null && language.isPlural != null) {
             if (isAbbreviated) {
@@ -260,6 +260,8 @@
             } else {
                 var precision = format.replace(pattern, '').split(format.indexOf('[.]') > -1 ? '[.]' : '.')[1];
                 var hasPrecision = precision != null && precision.trim().length > 0;
+                console.log('precision', precision, hasPrecision);
+                console.log('isPlural', hasPrecision ? absValue : absValue | 0);
                 if (language.isPlural(hasPrecision ? absValue : absValue | 0)) {
                     suffix = language.durations.plural[suffix];
                 } else {
