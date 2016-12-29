@@ -260,8 +260,6 @@
             } else {
                 var precision = format.replace(pattern, '').split(format.indexOf('[.]') > -1 ? '[.]' : '.')[1];
                 var hasPrecision = precision != null && precision.trim().length > 0;
-                console.log('precision', precision, hasPrecision);
-                console.log('isPlural', hasPrecision ? absValue : absValue | 0);
                 if (language.isPlural(hasPrecision ? absValue : absValue | 0)) {
                     suffix = language.durations.plural[suffix];
                 } else {
