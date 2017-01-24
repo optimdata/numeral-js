@@ -204,11 +204,14 @@
         return output;
     }
 
-    function formatTime (n) {
+    function formatTime (n, format) {
+        var showSeconds =  format.match(/:/g).length === 2;
         var hours = Math.floor(n._value/60/60),
             minutes = Math.floor((n._value - (hours * 60 * 60))/60),
             seconds = Math.round(n._value - (hours * 60 * 60) - (minutes * 60));
-        return hours + ':' + ((minutes < 10) ? '0' + minutes : minutes) + ':' + ((seconds < 10) ? '0' + seconds : seconds);
+        return hours +
+            ':' + (minutes < 10 ? '0' + minutes : minutes) +
+            (!showSeconds ? '' : ':' + (seconds < 10 ? '0' + seconds : seconds));
     }
 
     function unformatTime (string) {
