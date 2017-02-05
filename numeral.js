@@ -208,6 +208,10 @@
         var showSeconds =  format.match(/:/g).length === 2;
         // Take positive value to support negative durations
         var value = Math.abs(n._value);
+        if (!showSeconds) {
+            // Round to minutes if seconds are not shown
+            value = Math.round(value / 60) * 60;
+        }
         var hours = Math.floor(value / 60 / 60),
             minutes = Math.floor((value - (hours * 60 * 60)) / 60),
             seconds = Math.round(value - (hours * 60 * 60) - (minutes * 60));
