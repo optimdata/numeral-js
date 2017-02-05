@@ -206,10 +206,12 @@
 
     function formatTime (n, format) {
         var showSeconds =  format.match(/:/g).length === 2;
-        var hours = Math.floor(n._value/60/60),
-            minutes = Math.floor((n._value - (hours * 60 * 60))/60),
-            seconds = Math.round(n._value - (hours * 60 * 60) - (minutes * 60));
-        return hours +
+        // Take positive value to support negative durations
+        var value = Math.abs(n._value);
+        var hours = Math.floor(value / 60 / 60),
+            minutes = Math.floor((value - (hours * 60 * 60)) / 60),
+            seconds = Math.round(value - (hours * 60 * 60) - (minutes * 60));
+        return (n._value < 0 ? '-' : '') + hours +
             ':' + (minutes < 10 ? '0' + minutes : minutes) +
             (!showSeconds ? '' : ':' + (seconds < 10 ? '0' + seconds : seconds));
     }
