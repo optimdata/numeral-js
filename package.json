@@ -1,5 +1,5 @@
 {
-  "name": "numeral",
+  "name": "@spalger/numeral",
   "version": "2.0.0",
   "description": "Format and manipulate numbers.",
   "homepage": "http://numeraljs.com",
@@ -21,10 +21,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/optimdata/numeral-js.git"
+    "url": "git+https://github.com/spalger/numeral-js.git"
   },
   "bugs": {
-    "url": "https://github.com/optimdata/numeral-js/issues"
+    "url": "https://github.com/spalger/numeral-js/issues"
   },
   "license": "MIT",
   "devDependencies": {
