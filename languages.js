@@ -186,7 +186,37 @@
             thousand: 'k',
             million: 'm',
             billion: 'b',
-            trillion: 't'
+            trillion: 't',
+            seconds: 's',
+            minutes: 'min',
+            hours: 'h',
+            days: 'd',
+            weeks: 'w',
+            months: 'mo',
+            years: 'y',
+        },
+        isPlural: function (amount) {
+            return amount === 1 ? 0 : 1;
+        },
+        durations: {
+            plural: {
+                seconds: 'Sekunden',
+                minutes: 'Minuten',
+                hours: 'Stunden',
+                days: 'Tage',
+                weeks: 'Wochen',
+                months: 'Monten',
+                years: 'Jahre',
+            },
+            singular: {
+                seconds: 'Sekunde',
+                minutes: 'Minute',
+                hours: 'Stunde',
+                days: 'Tag',
+                weeks: 'Woche',
+                months: 'Monat',
+                years: 'Jahr',
+            },
         },
         ordinal: function (number) {
             return '.';
@@ -220,7 +250,37 @@
             thousand: 'k',
             million: 'm',
             billion: 'b',
-            trillion: 't'
+            trillion: 't',
+            seconds: 's',
+            minutes: 'min',
+            hours: 'h',
+            days: 'd',
+            weeks: 'wk',
+            months: 'mo',
+            years: 'y',
+        },
+        isPlural: function (amount) {
+            return amount === 1 ? 0 : 1;
+        },
+        durations: {
+            plural: {
+                seconds: 'seconds',
+                minutes: 'minutes',
+                hours: 'hours',
+                days: 'days',
+                weeks: 'weeks',
+                months: 'months',
+                years: 'years',
+            },
+            singular: {
+                seconds: 'second',
+                minutes: 'minute',
+                hours: 'hour',
+                days: 'day',
+                weeks: 'week',
+                months: 'month',
+                years: 'year',
+            },
         },
         ordinal: function (number) {
             var b = number % 10;
@@ -480,7 +540,37 @@
             thousand: 'k',
             million: 'm',
             billion: 'b',
-            trillion: 't'
+            trillion: 't',
+            seconds: 's',
+            minutes: 'min.',
+            hours: 'h',
+            days: 'j',
+            weeks: 'sem.',
+            months: 'mois',
+            years: 'a',
+        },
+        isPlural: function (amount) {
+            return amount != null && amount > 1 ? 1 : 0;
+        },
+        durations: {
+            plural: {
+                seconds: 'secondes',
+                minutes: 'minutes',
+                hours: 'heures',
+                days: 'jours',
+                weeks: 'semaines',
+                months: 'mois',
+                years: 'années',
+            },
+            singular: {
+                seconds: 'seconde',
+                minutes: 'minute',
+                hours: 'heure',
+                days: 'jour',
+                weeks: 'semaine',
+                months: 'mois',
+                years: 'année',
+            },
         },
         ordinal : function (number) {
             return number === 1 ? 'er' : 'e';
@@ -740,6 +830,47 @@
     }
 }());
 
+/*!
+ * numeral.js language configuration
+ * language : romanian (ro)
+ * author : Elena Neacsu : https://github.com/endeav
+ */
+(function () {
+    var language = {
+        delimiters: {
+            thousands: '.',
+            decimal: ','
+        },
+        abbreviations: {
+            thousand: 'k',
+            million: 'mil', // milion/milioane
+            billion: 'mld', // miliard/miliarde
+            trillion: 't',
+        },
+        ordinal: function (number) {
+            // In Romanian the ordinal can have different forms based on gender
+            // and the quantity
+            // masculine:
+            // E.g.: 1st = primul; 2nd = al doilea; 3rd = al treilea
+            // feminine:
+            // E.g.: 1st = prima; 2nd = a doua; 3rd = a treia
+            // Therefore is difficult to predict the format
+            return '';
+        },
+        currency: {
+            symbol: 'RON'
+        }
+    };
+
+    // Node
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = language;
+    }
+    // Browser
+    if (typeof window !== 'undefined' && this.numeral && this.numeral.language) {
+        this.numeral.language('ro', language);
+    }
+}());
 // numeral.js language configuration
 // language : Russian for the Ukraine (ru-UA)
 // author : Anatoli Papirovski : https://github.com/apapirovski
