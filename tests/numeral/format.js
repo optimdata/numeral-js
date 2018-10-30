@@ -24,7 +24,7 @@ exports.format = {
             i;
 
         test.expect(test.length);
-        
+
         for (i = 0; i < tests.length; i++) {
             format = n.format(test[i]);
             test.strictEqual(n.value(), value, 'value unchanged after format' + test[i]);
@@ -65,6 +65,11 @@ exports.format = {
                 [52,'0 o','52 nd'],
                 [23,'0o','23rd'],
                 [100,'0o','100th'],
+                [1.005,'0.00','1.01'],
+                [1e35,'000','1e+35'],
+                [-1e35,'000','-1e+35'],
+                [1e-27,'000','1e-27'],
+                [-1e-27,'000','-1e-27'],
 
                 // specified abbreviations
                 [-5444333222111, '0,0 aK', '-5,444,333,222 k'],
@@ -123,15 +128,19 @@ exports.format = {
 
     bytes: function (test) {
         var tests = [
+                [0, '0 b', '0 B'],
                 [100,'0b','100B'],
                 [1024*2,'0 b','2 KB'],
                 [1024*1024*5,'0b','5MB'],
                 [1024*1024*1024*7.343,'0.[0] b','7.3 GB'],
                 [1024*1024*1024*1024*3.1536544,'0.000b','3.154TB'],
-                [1024*1024*1024*1024*1024*2.953454534534,'0b','3PB']
+                [1024*1024*1024*1024*1024*2.953454534534,'0b','3PB'],
+                [1024*1024*1024*1024*1024*1024*1024*1024*1024, '0 b', '1024 YB']
             ].reduce(function (tests, test) {
               tests.push(test);
-              tests.push([test[0] * -1, test[1], '-' + test[2]]);
+              if (test[0] > 0) {
+                tests.push([test[0] * -1, test[1], '-' + test[2]]);
+              }
               return tests;
             }, []),
             i;
@@ -179,33 +188,7 @@ exports.format = {
 
         test.done();
     },
-    
-    duration: function (test) {
-        var tests = [
-                [25,'0 !','25 seconds'],
-                [60,'0.[0] !','1 minute'],
-                [90,'0.[0] !','1.5 minutes'],
-                [3600,'0. !','1 hour'],
-                [3600,'0.0 !','1.0 hour'],
-                [4600,'0. !','1 hour'],
-                [4600,'0.0 !','1.3 hours'],
-                [7200,'0. !','2 hours'],
-                [400000,'0.[0] !','4.6 days'],
-                [3600,'0 !!','1 h'],
-                [4600,'0 !!','1 h'],
-                [4600,'0[.][0] !!','1.3 h'],
-            ],
-            i;
 
-        test.expect(tests.length);
-
-        for (i = 0; i < tests.length; i++) {
-            test.strictEqual(numeral(tests[i][0]).format(tests[i][1]), tests[i][2], tests[i][1]);
-        }
-
-        test.done();
-    },
-    
     rounding: function (test) {
       var tests = [
             // value, format string, expected w/ floor, expected w/ ceil
@@ -216,19 +199,19 @@ exports.format = {
             [-0.433,'0 %','-44 %', '-43 %']
         ],
         i;
-      
+
       test.expect(tests.length * 2);
-      
+
       for (i = 0; i < tests.length; i++) {
           // floor
           test.strictEqual(numeral(tests[i][0]).format(tests[i][1], Math.floor), tests[i][2], tests[i][1] + ", floor");
-          
+
           // ceil
-          test.strictEqual(numeral(tests[i][0]).format(tests[i][1], Math.ceil), tests[i][3], tests[i][1] + ", ceil"); 
-         
+          test.strictEqual(numeral(tests[i][0]).format(tests[i][1], Math.ceil), tests[i][3], tests[i][1] + ", ceil");
+
       }
-      
+
       test.done();
-      
+
     },
 };

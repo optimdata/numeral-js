@@ -32,3 +32,4 @@
         this.numeral.language('chs', language);
     }
 }());
+

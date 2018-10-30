@@ -20,7 +20,7 @@
             days: 'd',
             weeks: 'wk',
             months: 'mo',
-            years: 'y',
+            years: 'y'
         },
         isPlural: function (amount) {
             return amount === 1 ? 0 : 1;

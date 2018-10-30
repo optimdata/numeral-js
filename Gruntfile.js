@@ -1,44 +1,12 @@
-var fs = require('fs');
+const fs = require('fs');
+const path = require('path');
+const prettier = require('prettier');
 
 module.exports = function(grunt) {
-
-    var minifiedFiles = {
-            'min/numeral.min.js' : [
-                'numeral.js'
-            ],
-            'min/languages.min.js': [
-                'languages.js'
-            ]
-        };
-
-    // all the lang files need to be added manually
-    fs.readdirSync('./languages').forEach(function (path) {
-        var file = path.slice(0, -3),
-            destination = 'min/languages/' + file + '.min.js',
-            src = ['languages/' + path];
-
-        minifiedFiles[destination] = src;
-    });
 
     grunt.initConfig({
         nodeunit : {
             all : ['tests/**/*.js']
-        },
-        uglify: {
-            my_target: {
-                files: minifiedFiles
-            },
-            options: {
-                preserveComments: 'some'
-            }
-        },
-        concat: {
-            languages: {
-                src: [
-                    'languages/**/*.js'
-                ],
-                dest: 'languages.js'
-            }
         },
         jshint: {
             all: [
@@ -65,26 +33,57 @@ module.exports = function(grunt) {
     });
 
     grunt.loadNpmTasks('grunt-contrib-nodeunit');
-    grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-jshint');
-    grunt.loadNpmTasks('grunt-contrib-concat');
 
     grunt.registerTask('default', [
         'test'
     ]);
 
     grunt.registerTask('test', [
-        'jshint',
+        // 'jshint',
         'nodeunit'
     ]);
 
-    // P
-    grunt.registerTask('build', [
-        'jshint',
-        'nodeunit',
-        'concat',
-        'uglify'
-    ]);
+    grunt.registerTask('build-languages', function () {
+      const langs = fs.readdirSync(path.resolve(__dirname, 'languages'))
+        .map(filename => {
+          const id = filename.split('.js')[0]
+          const content = fs.readFileSync(path.resolve(__dirname, 'languages', filename), 'utf8');
+          const name = content.match(/(?:\*|\/\/)\s*language\s*:\s*(.+)$/m)[1]
+
+          const lines = content.split('\n');
+          const start = lines.findIndex(line => line.match(/^\s{4}var\s+language\s+=\s+\{/))
+          const end = lines.findIndex(line => line.match(/^\s{4}\};/))
+          if (start === -1) {
+            throw new Error('could not find start');
+          }
+          if (end === -1) {
+            throw new Error('could not find end');
+          }
+
+          const code = lines.slice(start + 1, end);
+          if (!code[0].match(/^\s{8}delimiters: {$/)) {
+            throw new Error('code does not look right');
+          }
+
+          return `{
+            id: '${id}',
+            name: '${name}',
+            lang: {
+              ${code.join('\n')}
+            },
+          }`
+        })
+        .join(',\n');
+
+      fs.writeFileSync(
+        path.resolve(__dirname, './languages.js'),
+        prettier.format(`module.exports = [${langs}]`, {
+          singleQuote: true,
+          printWidth: 120,
+        })
+      );
+    });
 
     // Travis CI task.
     grunt.registerTask('travis', ['test']);

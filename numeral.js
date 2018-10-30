@@ -6,8 +6,7 @@
  * http://adamwdraper.github.com/Numeral-js/
  */
 
-(function () {
-
+var numeralFactory = function () {
     /************************************
         Constants
     ************************************/
@@ -18,9 +17,7 @@
         languages = {},
         currentLanguage = 'en',
         zeroFormat = null,
-        defaultFormat = '0,0',
-        // check for nodeJS
-        hasModule = (typeof module !== 'undefined' && module.exports);
+        defaultFormat = '0,0';
 
 
     /************************************
@@ -43,10 +40,9 @@
         var power = Math.pow(10, precision),
             optionalsRegExp,
             output;
-            
-        //roundingFunction = (roundingFunction !== undefined ? roundingFunction : Math.round);
+
         // Multiply up by precision, round accurately, then divide and use native toFixed():
-        output = (roundingFunction(value * power) / power).toFixed(precision);
+        output = (roundingFunction(value + 'e+' + precision) / power).toFixed(precision);
 
         if (optionals) {
             optionalsRegExp = new RegExp('0{1,' + optionals + '}$');
@@ -111,7 +107,7 @@
                 trillionRegExp = new RegExp('[^a-zA-Z]' + languages[currentLanguage].abbreviations.trillion + '(?:\\)|(\\' + languages[currentLanguage].currency.symbol + ')?(?:\\))?)?$');
 
                 // see if bytes are there so that we can multiply to the correct number
-                for (power = 0; power <= suffixes.length; power++) {
+                for (power = 0; power < suffixes.length; ++power) {
                     bytesMultiplier = (string.indexOf(suffixes[power]) > -1) ? Math.pow(1024, power + 1) : false;
 
                     if (bytesMultiplier) {
@@ -192,7 +188,7 @@
         }
 
         output = formatNumber(value, format, roundingFunction);
-        
+
         if (output.indexOf(')') > -1 ) {
             output = output.split('');
             output.splice(-1, 0, space + '%');
@@ -240,14 +236,46 @@
         return Number(seconds);
     }
 
+    function formatByteUnits (value) {
+        var suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
+            suffix = suffixes[0],
+            power,
+            min,
+            max,
+            abs = Math.abs(value),
+            matched = (abs < 1024);
+
+        if (!matched) {
+            for (power = 1; power < suffixes.length; ++power) {
+                min = Math.pow(1024, power);
+                max = Math.pow(1024, power + 1);
+
+                if (abs >= min && abs < max) {
+                    matched = true;
+                    suffix = suffixes[power];
+                    value = value / min;
+                    break;
+                }
+            }
+
+            // values greater than or equal to 1024 YB
+            if (!matched) {
+                value = value / Math.pow(1024, suffixes.length - 1);
+                suffix = suffixes[suffixes.length - 1];
+            }
+        }
+
+        return { value: value, suffix: suffix };
+    }
+
     function formatDuration (n, format, roundingFunction, isAbbreviated) {
         var space = '',
-            output,
-            pattern = isAbbreviated ? '!!' : '!',
-            language = languages[currentLanguage],
-            value = n._value,
-            suffix = 'seconds',
-            absValue = Math.abs(value);
+        output,
+        pattern = isAbbreviated ? '!!' : '!',
+        language = languages[currentLanguage],
+        value = n._value,
+        suffix = 'seconds',
+        absValue = Math.abs(value);
         if (absValue >= 365 * 86400) {
             suffix = 'years';
             value /= 365 * 86400;
@@ -262,7 +290,7 @@
             value /= 60;
         }
         absValue = Math.abs(value);
-
+        
         if (language.durations != null && language.isPlural != null) {
             if (isAbbreviated) {
                 suffix = language.abbreviations[suffix];
@@ -276,7 +304,7 @@
                 }
             }
         }
-
+        
         // check for space before '!'
         if (format.indexOf(' ' + pattern) > -1) {
             space = ' ';
@@ -284,7 +312,7 @@
         } else {
             format = format.replace(pattern, '');
         }
-
+        
         output = formatNumber(value, format, roundingFunction);
         
         if (output.indexOf(')') > -1 ) {
@@ -294,14 +322,14 @@
         } else {
             output = output + space + suffix;
         }
-
+        
         return output;
     }
-
+    
     function unformatDuration(string) {
         return 0;
     }
-
+    
     function formatNumber (value, format, roundingFunction) {
         var negP = false,
             signed = false,
@@ -313,23 +341,20 @@
             abbrT = false, // force abbreviation to trillions
             abbrForce = false, // force abbreviation
             bytes = '',
+            units,
             ord = '',
             abs = Math.abs(value),
-            suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
-            min,
-            max,
-            power,
             w,
             precision,
             thousands,
             d = '',
-            neg = false,
-            absValue = Math.abs(value);
+            neg = false;
 
         // check if number is zero and a custom zero format has been set
         if (value === 0 && zeroFormat !== null) {
             return zeroFormat;
         } else {
+            var isExponent = 'number' === typeof value && value.toString().match(/e[+-]/);
             // see if we should use parentheses for negative number or if we should prefix with a sign
             // if both are present we default to parentheses
             if (format.indexOf('(') > -1) {
@@ -386,18 +411,10 @@
                     format = format.replace('b', '');
                 }
 
-                for (power = 0; power <= suffixes.length; power++) {
-                    min = Math.pow(1024, power);
-                    max = Math.pow(1024, power+1);
+                units = formatByteUnits(value);
 
-                    if (absValue >= min && absValue < max) {
-                        bytes = bytes + suffixes[power];
-                        if (min > 0) {
-                            value = value / min;
-                        }
-                        break;
-                    }
-                }
+                value = units.value;
+                bytes = bytes + units.suffix;
             }
 
             // see if ordinal is wanted
@@ -422,7 +439,7 @@
             precision = format.split('.')[1];
             thousands = format.indexOf(',');
 
-            if (precision) {
+            if (precision && !isExponent) {
                 if (precision.indexOf('[') > -1) {
                     precision = precision.replace(']', '');
                     precision = precision.split('[');
@@ -443,11 +460,13 @@
                     d = '';
                 }
             } else {
-                w = toFixed(value, null, roundingFunction);
+                // don't case exponents to a fixed value, just cast them to strings
+                if (isExponent) w = value.toString();
+                else w = toFixed(value, 0, roundingFunction);
             }
 
-            // format number
-            if (w.indexOf('-') > -1) {
+            // format negative number
+            if (w.indexOf('-') === 0) {
                 w = w.slice(1);
                 neg = true;
             }
@@ -509,7 +528,7 @@
 
         return numeral;
     };
-    
+
     // This function provides access to the loaded language data.  If
     // no arguments are passed in, it will simply return the current
     // global language object.
@@ -517,11 +536,11 @@
         if (!key) {
             return languages[currentLanguage];
         }
-        
+
         if (!languages[key]) {
             throw new Error('Unknown language : ' + key);
         }
-        
+
         return languages[key];
     };
 
@@ -608,14 +627,14 @@
     if ('function' !== typeof Array.prototype.reduce) {
         Array.prototype.reduce = function (callback, opt_initialValue) {
             'use strict';
-            
+
             if (null === this || 'undefined' === typeof this) {
                 // At the moment all modern browsers, that support strict mode, have
                 // native implementation of Array.prototype.reduce. For instance, IE8
                 // does not support strict mode, so this check is actually useless.
                 throw new TypeError('Array.prototype.reduce called on null or undefined');
             }
-            
+
             if ('function' !== typeof callback) {
                 throw new TypeError(callback + ' is not a function');
             }
@@ -649,7 +668,7 @@
         };
     }
 
-    
+
     /**
      * Computes the multiplier necessary to make x >= 1,
      * effectively eliminating miscalculations caused by
@@ -675,7 +694,7 @@
                 mn = multiplier(next);
         return mp > mn ? mp : mn;
         }, -Infinity);
-    }        
+    }
 
 
     /************************************
@@ -690,17 +709,21 @@
         },
 
         format : function (inputString, roundingFunction) {
-            return formatNumeral(this, 
-                  inputString ? inputString : defaultFormat, 
+            return formatNumeral(this,
+                  inputString ? inputString : defaultFormat,
                   (roundingFunction !== undefined) ? roundingFunction : Math.round
               );
         },
 
         unformat : function (inputString) {
-            if (Object.prototype.toString.call(inputString) === '[object Number]') { 
-                return inputString; 
+            if (Object.prototype.toString.call(inputString) === '[object Number]') {
+                return inputString;
             }
             return unformatNumeral(this, inputString ? inputString : defaultFormat);
+        },
+
+        byteUnits : function () {
+            return formatByteUnits(this._value).suffix;
         },
 
         value : function () {
@@ -730,7 +753,7 @@
             function cback(accum, curr, currI, O) {
                 return accum - corrFactor * curr;
             }
-            this._value = [value].reduce(cback, this._value * corrFactor) / corrFactor;            
+            this._value = [value].reduce(cback, this._value * corrFactor) / corrFactor;
             return this;
         },
 
@@ -749,7 +772,7 @@
                 var corrFactor = correctionFactor(accum, curr);
                 return (accum * corrFactor) / (curr * corrFactor);
             }
-            this._value = [this._value, value].reduce(cback);            
+            this._value = [this._value, value].reduce(cback);
             return this;
         },
 
@@ -759,27 +782,16 @@
 
     };
 
-    /************************************
-        Exposing Numeral
-    ************************************/
+    return numeral;
+};
 
-    // CommonJS module is defined
-    if (hasModule) {
-        module.exports = numeral;
+// expose numeral via UMD wrapper
+(function (root, factory) {
+    if (typeof define === "function" && define.amd) {
+        define([], factory);
+    } else if (typeof exports === "object") {
+        module.exports = factory();
+    } else {
+        root.numeral = factory();
     }
-
-    /*global ender:false */
-    if (typeof ender === 'undefined') {
-        // here, `this` means `window` in the browser, or `global` on the server
-        // add `numeral` as a global object via a string identifier,
-        // for Closure Compiler 'advanced' mode
-        this['numeral'] = numeral;
-    }
-
-    /*global define:false */
-    if (typeof define === 'function' && define.amd) {
-        define([], function () {
-            return numeral;
-        });
-    }
-}).call(this);
+}(this, numeralFactory));

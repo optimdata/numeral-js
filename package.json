@@ -1,41 +1,33 @@
 {
   "name": "@elastic/numeral",
-  "version": "2.0.0",
-  "description": "Format and manipulate numbers.",
-  "homepage": "http://numeraljs.com",
+  "version": "2.3.2",
+  "description": "Fork of numeraljs for use in Kibana",
   "authors": [
     "Adam Draper <adamwdraper@gmail.com> (http://github.com/adamwdraper)",
-    "Spencer Alger <email@spalger.com>"
+    "Spencer Alger <spalger@users.noreply.github.com>",
+    "Chris Earle <pickypg+npm@elastic.co>"
   ],
-  "keywords": [
-    "numeral",
-    "number",
-    "format",
-    "time",
-    "money",
-    "percentage"
-  ],
+  "scripts": {
+    "test": "grunt",
+    "build": "grunt build-languages"
+  },
   "main": "./numeral.js",
   "engines": {
-    "node": "*"
+    "node": ">= 0.10"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/spalger/numeral-js.git"
+    "url": "git+https://github.com/elastic/numeral-js.git"
   },
   "bugs": {
-    "url": "https://github.com/spalger/numeral-js/issues"
+    "url": "https://github.com/elastic/numeral-js/issues"
   },
   "license": "MIT",
   "devDependencies": {
-    "grunt": "latest",
-    "grunt-contrib-concat": "~0.3.0",
-    "grunt-contrib-jshint": "latest",
-    "grunt-contrib-nodeunit": "^0.4.1",
-    "grunt-contrib-uglify": "latest",
-    "uglify-js": "latest"
-  },
-  "scripts": {
-    "test": "grunt"
+    "grunt": "^1.0.1",
+    "grunt-cli": "^1.2.0",
+    "grunt-contrib-jshint": "^1.0.0",
+    "grunt-contrib-nodeunit": "^1.0.0",
+    "prettier": "*"
   }
 }
